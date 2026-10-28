@@ -1,2 +1,3 @@
 master https://github.com/simdutf/simdutf 8eae03d17ce4305194fc5fbc6551b5807f9c6a63
 pr https://github.com/mvanslobbe/simdutf-fork 9df5d2d7802d2c4b6e54e2ff7c7671077ed6c0a0
+fix https://github.com/mvanslobbe/simdutf-fork 620fd157d0e2c9cc46a9f0eb4828fad464b963f4
