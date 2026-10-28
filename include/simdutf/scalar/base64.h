@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <array>
 #include <cstring>
-#include <type_traits>
 
 namespace simdutf {
 namespace scalar {
@@ -15,7 +14,7 @@ namespace base64 {
 simdutf_really_inline simdutf_constexpr23 void
 copy_encode_pair(char *dst, const std::array<char, 2> &pair) {
 #if SIMDUTF_CPLUSPLUS23
-  if (std::is_constant_evaluated()) {
+  if consteval {
     dst[0] = pair[0];
     dst[1] = pair[1];
     return;
@@ -234,7 +233,6 @@ simdutf_constexpr23 full_result base64_tail_decode_impl(
       if ((x0 | x1 | x2) >= 0x01FFFFFF) {
         break;
       }
-#if SIMDUTF_IS_BIG_ENDIAN
       dst[0] = static_cast<char>(x0);
       dst[1] = static_cast<char>(x0 >> 8);
       dst[2] = static_cast<char>(x0 >> 16);
@@ -244,27 +242,6 @@ simdutf_constexpr23 full_result base64_tail_decode_impl(
       dst[6] = static_cast<char>(x2);
       dst[7] = static_cast<char>(x2 >> 8);
       dst[8] = static_cast<char>(x2 >> 16);
-#else
-      const uint64_t word = uint64_t(x0 & 0x00FFFFFF) |
-                            (uint64_t(x1 & 0x00FFFFFF) << 24) |
-                            (uint64_t(x2 & 0xFFFF) << 48);
-  #if SIMDUTF_CPLUSPLUS23
-      if (std::is_constant_evaluated()) {
-        dst[0] = static_cast<char>(x0);
-        dst[1] = static_cast<char>(x0 >> 8);
-        dst[2] = static_cast<char>(x0 >> 16);
-        dst[3] = static_cast<char>(x1);
-        dst[4] = static_cast<char>(x1 >> 8);
-        dst[5] = static_cast<char>(x1 >> 16);
-        dst[6] = static_cast<char>(x2);
-        dst[7] = static_cast<char>(x2 >> 8);
-      } else
-  #endif
-      {
-        std::memcpy(dst, &word, sizeof(word));
-      }
-      dst[8] = static_cast<char>(x2 >> 16);
-#endif
       src += 12;
       dst += 9;
     }
