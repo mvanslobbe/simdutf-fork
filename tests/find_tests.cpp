@@ -221,4 +221,34 @@ TEST(find_char_needle_absent) {
   }
 }
 
+template <typename char_type, typename impl>
+void every_position(impl &implementation) {
+  // Exact-size buffers, so that the sanitizers catch reads past the end.
+  for (size_t len = 0; len <= 200; ++len) {
+    for (size_t offset = 0; offset < 64 / sizeof(char_type); ++offset) {
+      std::vector<char_type> buffer(offset + len, char_type('a'));
+      char_type *start = buffer.data() + offset;
+      char_type *end = start + len;
+      for (size_t pos = 0; pos <= len; ++pos) {
+        if (pos < len) {
+          start[pos] = char_type('z');
+        }
+        const char_type *result = implementation.find(start, end, 'z');
+        ASSERT_TRUE(result == start + pos);
+        if (pos < len) {
+          start[pos] = char_type('a');
+        }
+      }
+    }
+  }
+}
+
+TEST(find_char_every_length_offset_and_position) {
+  every_position<char>(implementation);
+}
+
+TEST(find_char16_every_length_offset_and_position) {
+  every_position<char16_t>(implementation);
+}
+
 TEST_MAIN
